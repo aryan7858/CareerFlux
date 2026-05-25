@@ -133,7 +133,7 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    if (process.env.NODE_ENV !== 'production') {
+    if (require.main === module) {
       app.listen(PORT, () => {
         console.log(`🚀 CareerFlux API running on http://localhost:${PORT}`);
       });
