@@ -17,7 +17,7 @@ export default defineConfig({
         port: 5173,
         proxy: {
             '/api': {
-                target: 'http://localhost:5000',
+                target: 'https://careerflux-backend-git-main-aryan7858s-projects.vercel.app',
                 changeOrigin: true,
             },
         },
