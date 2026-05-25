@@ -25,8 +25,14 @@ const app = express();
 // ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: [
+    'https://careerflux-aryan7858s-projects.vercel.app',
+    'https://careerflux-self.vercel.app',
+    'http://localhost:5173',
+  ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // ─── Body Parsing ─────────────────────────────────────────────────────────────
