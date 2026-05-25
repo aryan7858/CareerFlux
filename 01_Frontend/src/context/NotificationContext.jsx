@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { notificationsAPI } from '../services/api';
+import { notificationsAPI, API_BASE_URL } from '../services/api';
 import toast from 'react-hot-toast';
 
 const NotificationContext = createContext(null);
@@ -36,8 +36,7 @@ export function NotificationProvider({ children }) {
         if (!token) return;
 
         // In local development we point directly to backend to bypass Vite proxy buffering
-        const apiBase = import.meta.env.VITE_API_URL || 
-            (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+        const apiBase = API_BASE_URL;
         
         const streamUrl = `${apiBase}/notifications/stream?token=${token}`;
         

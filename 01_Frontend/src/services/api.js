@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://careerflux-backend-git-main-aryan7858s-projects.vercel.app/api';
+export const SERVER_URL = API_BASE_URL.replace(/\/api$/, '');
+
 // Base API instance — uses Vite proxy in dev, direct URL in production
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -76,7 +79,7 @@ export const resumesAPI = {
     delete: () => API.delete('/resumes/my'),
     viewUrl: (id) => {
         const token = localStorage.getItem('careerflux_token');
-        const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const baseURL = API_BASE_URL;
         return `${baseURL}/resumes/view/${id}?token=${token}`;
     },
 };

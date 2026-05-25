@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNotifications } from '../../context/NotificationContext';
-import { applicationsAPI, resumesAPI, aiAPI, profileAPI } from '../../services/api';
+import { applicationsAPI, resumesAPI, aiAPI, profileAPI, SERVER_URL } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import toast from 'react-hot-toast';
@@ -432,7 +432,7 @@ export default function SeekerDashboard() {
                                                     </a>
                                                 )}
                                                 {proj.fileUrl && (
-                                                    <a href={`http://localhost:5000${proj.fileUrl}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+                                                    <a href={`${SERVER_URL}${proj.fileUrl}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
                                                         📄 File: {proj.fileName}
                                                     </a>
                                                 )}

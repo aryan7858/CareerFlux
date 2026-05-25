@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { applicationsAPI, resumesAPI, aiAPI, profileAPI } from '../../services/api';
+import { applicationsAPI, resumesAPI, aiAPI, profileAPI, SERVER_URL } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import Navbar from '../../components/Navbar';
@@ -505,7 +505,7 @@ export default function ViewApplicants() {
                                                             </a>
                                                         )}
                                                         {proj.fileUrl && (
-                                                            <a href={`http://localhost:5000${proj.fileUrl}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 600 }}>
+                                                            <a href={`${SERVER_URL}${proj.fileUrl}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 600 }}>
                                                                 📄 File
                                                             </a>
                                                         )}
