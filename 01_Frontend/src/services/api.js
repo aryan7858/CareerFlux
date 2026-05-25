@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://careerflux-backend-git-main-aryan7858s-projects.vercel.app/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://careerflux-backend.vercel.app/api';
 export const SERVER_URL = API_BASE_URL.replace(/\/api$/, '');
 
 // Base API instance — uses Vite proxy in dev, direct URL in production
