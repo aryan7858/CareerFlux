@@ -25,11 +25,24 @@ const app = express();
 // ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: [
-    'https://careerflux-aryan7858s-projects.vercel.app',
-    'https://careerflux-self.vercel.app',
-    'http://localhost:5173',
-  ],
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'https://careerflux-aryan7858s-projects.vercel.app',
+      'https://careerflux-git-main-aryan7858s-projects.vercel.app',
+      'https://careerflux-self.vercel.app',
+      'http://localhost:5173',
+    ];
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Allow any vercel.app subdomain for this project
+    if (origin.includes('careerflux') && origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
