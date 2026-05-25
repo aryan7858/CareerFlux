@@ -34,7 +34,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Static Files (for resume downloads) ──────────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const isVercel = process.env.VERCEL === '1';
+const uploadsDir = isVercel 
+  ? path.join('/tmp', 'uploads') 
+  : path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsDir));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -95,9 +99,11 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(PORT, () => {
-      console.log(`🚀 CareerFlux API running on http://localhost:${PORT}`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => {
+        console.log(`🚀 CareerFlux API running on http://localhost:${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error('❌ MongoDB connection failed:', err.message);

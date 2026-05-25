@@ -17,16 +17,23 @@ const { protect, authorize } = require('../middleware/auth');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         let uploadPath = '';
+        const isVercel = process.env.VERCEL === '1';
+        const baseDir = isVercel ? '/tmp' : path.join(__dirname, '..');
+
         if (file.fieldname === 'portfolioFile') {
-            uploadPath = path.join(__dirname, '..', 'uploads', 'portfolio');
+            uploadPath = path.join(baseDir, 'uploads', 'portfolio');
         } else if (file.fieldname === 'verificationDoc') {
-            uploadPath = path.join(__dirname, '..', 'uploads', 'verifications');
+            uploadPath = path.join(baseDir, 'uploads', 'verifications');
         } else {
-            uploadPath = path.join(__dirname, '..', 'uploads', 'temp');
+            uploadPath = path.join(baseDir, 'uploads', 'temp');
         }
 
         if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
+            try {
+                fs.mkdirSync(uploadPath, { recursive: true });
+            } catch (err) {
+                console.warn('Warning: Could not create upload directory:', err.message);
+            }
         }
         cb(null, uploadPath);
     },
