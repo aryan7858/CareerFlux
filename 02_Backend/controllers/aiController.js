@@ -36,7 +36,7 @@ const calculateLocalMatch = (user, job) => {
         matchedSkills.push(skill);
       }
     });
-    skillScore = userSkills.length > 0 ? Math.min(100, (overlapCount / Math.min(5, userSkills.length)) * 100) : 60;
+    skillScore = userSkills.length > 0 ? Math.min(100, (overlapCount / Math.min(5, userSkills.length)) * 100) : 0;
   }
 
   // Calculate experience fit
@@ -138,6 +138,9 @@ Education: ${JSON.stringify((user.education || []).map(ed => ({ degree: ed.degre
 exports.getSmartRecommendations = async (req, res) => {
   try {
     const seeker = req.user;
+    if (!seeker.skills || seeker.skills.length === 0) {
+      return sendSuccess(res, { recommendations: [], hasSkills: false }, 'Add skills to profile to unlock smart match.');
+    }
     const activeJobs = await Job.find({ isActive: true }).populate('postedBy', 'companyName companyLogoUrl');
     
     const recommendations = activeJobs.map(job => {

@@ -1,4 +1,5 @@
 const Job = require('../models/Job');
+const Application = require('../models/Application');
 const { sendSuccess, sendError } = require('../utils/response');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -278,8 +279,10 @@ exports.deleteJob = async (req, res) => {
         }
 
         await Job.findByIdAndDelete(req.params.id);
+        // Cascade delete related applications for this job
+        await Application.deleteMany({ job: req.params.id });
 
-        return sendSuccess(res, {}, 'Job deleted successfully.');
+        return sendSuccess(res, {}, 'Job and related applications deleted successfully.');
     } catch (err) {
         console.error('DeleteJob error:', err);
         return sendError(res, 'Failed to delete job.', 500);

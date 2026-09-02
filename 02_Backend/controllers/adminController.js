@@ -200,7 +200,10 @@ exports.adminDeleteJob = async (req, res) => {
             return sendError(res, 'Job not found.', 404);
         }
 
-        return sendSuccess(res, {}, 'Job deleted successfully.');
+        // Cascade delete related applications for this job
+        await Application.deleteMany({ job: req.params.id });
+
+        return sendSuccess(res, {}, 'Job and related applications deleted successfully.');
     } catch (err) {
         console.error('AdminDeleteJob error:', err);
         return sendError(res, 'Failed to delete job.', 500);

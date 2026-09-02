@@ -435,7 +435,7 @@ export default function SeekerDashboard() {
                                                 <tr key={app._id} style={{ borderBottom: '1px solid var(--border)' }}>
                                                     <td style={{ padding: '14px 0', fontWeight: 600, color: 'var(--text)' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                            {app.job?.title || 'N/A'}
+                                                            {app.job?.title ? app.job.title : <span style={{ color: '#ef4444', background: 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: 6, fontSize: '0.78rem' }}>Position Closed</span>}
                                                             {app.interview && app.interview.status === 'scheduled' && (
                                                                 <span 
                                                                     style={{ background: 'var(--stat-amb-bg)', color: 'var(--stat-amb-cl)', fontSize: '0.68rem', padding: '1px 6px', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: 2 }}
@@ -446,7 +446,7 @@ export default function SeekerDashboard() {
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td style={{ padding: '14px 0', color: 'var(--text-muted)' }}>{app.job?.company || 'N/A'}</td>
+                                                    <td style={{ padding: '14px 0', color: 'var(--text-muted)' }}>{app.job?.company || '—'}</td>
                                                     <td style={{ padding: '14px 0' }}>
                                                         <span style={{ ...statusStyle[app.status], padding: '3px 10px', borderRadius: 99, fontSize: '0.72rem', fontWeight: 700, textTransform: 'capitalize' }}>
                                                             {app.status}
@@ -464,7 +464,9 @@ export default function SeekerDashboard() {
                                                                 Messages ({app.replies.length})
                                                             </button>
                                                         )}
-                                                        <Link to={`/jobs/${app.job?._id}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 16 }}><HiExternalLink /></Link>
+                                                        {app.job?._id && (
+                                                            <Link to={`/jobs/${app.job._id}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 16 }}><HiExternalLink /></Link>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}
