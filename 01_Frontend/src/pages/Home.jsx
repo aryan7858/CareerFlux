@@ -66,6 +66,12 @@ export default function Home() {
             .catch(() => setPublicStats(null)); // fail silently — never break the page
     }, []);
 
+    const heroStats = publicStats ? [
+        publicStats.totalJobs >= STAT_THRESHOLD && { num: `${publicStats.totalJobs}+`, label: 'Jobs Posted' },
+        publicStats.uniqueCompanies >= STAT_THRESHOLD && { num: `${publicStats.uniqueCompanies}+`, label: 'Companies' },
+        publicStats.totalJobseekers >= STAT_THRESHOLD && { num: `${publicStats.totalJobseekers}+`, label: 'Job Seekers' },
+    ].filter(Boolean) : [];
+
     return (
         <div style={{ background: 'var(--bg)', minHeight: '100vh', transition: 'background 0.2s, color 0.2s' }}>
 
@@ -79,6 +85,7 @@ export default function Home() {
                 title="Find & Land Your Dream"
                 highlightedText="Career Today"
                 subtitle="Thousands of verified job listings from top companies worldwide. Your next opportunity is just one application away."
+                stats={heroStats}
                 ctaButton={{
                     label: 'Browse all jobs →',
                     onClick: () => navigate('/jobs'),

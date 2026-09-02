@@ -13,6 +13,7 @@ export function Web3MediaHero({
     cryptoIcons = [],
     trustedByText = "Trusted by",
     brands = [],
+    stats,
     className,
     children,
 }) {
@@ -317,43 +318,41 @@ export function Web3MediaHero({
                         )}
 
                         {/* Stat row */}
-                        <div
-                            style={{
-                                display: "flex",
-                                gap: 40,
-                                flexWrap: "wrap",
-                                justifyContent: "center",
-                                marginTop: 8,
-                            }}
-                        >
-                            {[
-                                { num: "13k+", label: "Jobs Posted" },
-                                { num: "8k+", label: "Companies" },
-                                { num: "50k+", label: "Job Seekers" },
-                            ].map((s) => (
-                                <div key={s.label} style={{ textAlign: "center" }}>
-                                    <p
-                                        style={{
-                                            fontWeight: 800,
-                                            fontSize: "1.6rem",
-                                            color: "var(--text)",
-                                            lineHeight: 1.1,
-                                        }}
-                                    >
-                                        {s.num}
-                                    </p>
-                                    <p
-                                        style={{
-                                            color: "var(--text-muted)",
-                                            fontSize: "0.78rem",
-                                            marginTop: 4,
-                                        }}
-                                    >
-                                        {s.label}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
+                        {stats && stats.length > 0 && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    gap: 40,
+                                    flexWrap: "wrap",
+                                    justifyContent: "center",
+                                    marginTop: 8,
+                                }}
+                            >
+                                {stats.map((s) => (
+                                    <div key={s.label} style={{ textAlign: "center" }}>
+                                        <p
+                                            style={{
+                                                fontWeight: 800,
+                                                fontSize: "1.6rem",
+                                                color: "var(--text)",
+                                                lineHeight: 1.1,
+                                            }}
+                                        >
+                                            {s.num}
+                                        </p>
+                                        <p
+                                            style={{
+                                                color: "var(--text-muted)",
+                                                fontSize: "0.78rem",
+                                                marginTop: 4,
+                                            }}
+                                        >
+                                            {s.label}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </motion.div>
                 </div>
             )}

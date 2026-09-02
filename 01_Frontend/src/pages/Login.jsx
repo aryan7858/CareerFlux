@@ -49,10 +49,10 @@ export default function Login() {
                     <h2 style={{ fontWeight: 800, fontSize: '2.2rem', color: '#fff', marginBottom: 16, lineHeight: 1.2 }}>Welcome Back to CareerFlux</h2>
                     <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, maxWidth: 340 }}>Thousands of jobs are waiting for you. Sign in and take the next step in your career journey.</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 48 }}>
-                        {[{ num: '13k+', label: 'Open Jobs' }, { num: '8k+', label: 'Companies' }, { num: '50k+', label: 'Job Seekers' }, { num: '95%', label: 'Success Rate' }].map(s => (
-                            <div key={s.label} style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '20px 16px', textAlign: 'center' }}>
-                                <p style={{ fontWeight: 800, fontSize: '1.6rem', color: '#fff' }}>{s.num}</p>
-                                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.78rem', marginTop: 4 }}>{s.label}</p>
+                        {[{ label: 'Verified Jobs', desc: 'Active listings' }, { label: 'Top Companies', desc: 'Direct hiring' }, { label: 'Smart Match', desc: 'AI screening' }, { label: 'Protected', desc: 'Verified profiles' }].map(s => (
+                            <div key={s.label} style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '16px 12px', textAlign: 'center' }}>
+                                <p style={{ fontWeight: 800, fontSize: '1rem', color: '#fff' }}>{s.label}</p>
+                                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.75rem', marginTop: 4 }}>{s.desc}</p>
                             </div>
                         ))}
                     </div>
