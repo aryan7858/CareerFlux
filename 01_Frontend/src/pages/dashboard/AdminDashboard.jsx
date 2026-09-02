@@ -39,16 +39,33 @@ export default function AdminDashboard() {
     const fetchDashboard = async () => {
         try {
             const [statsRes, usersRes, jobsRes, appsRes] = await Promise.all([
-                adminAPI.getStats(), 
-                adminAPI.getUsers({ limit: 100 }), 
-                adminAPI.getJobs({ limit: 100 }),
-                adminAPI.getApplications({ limit: 100 })
+                adminAPI.getStats().catch(err => { console.error('getStats error:', err); return null; }), 
+                adminAPI.getUsers({ limit: 500 }), 
+                adminAPI.getJobs({ limit: 500 }),
+                adminAPI.getApplications({ limit: 500 })
             ]);
-            setStats(statsRes.data.stats); 
-            setUsers(usersRes.data.users); 
-            setJobs(jobsRes.data.jobs);
-            setApplications(appsRes.data.applications);
-        } catch (err) { console.error(err); }
+
+            const fetchedUsers = usersRes?.data?.users || [];
+            const fetchedJobs = jobsRes?.data?.jobs || [];
+            const fetchedApps = appsRes?.data?.applications || [];
+
+            const apiStats = statsRes?.data?.stats || {};
+
+            const computedStats = {
+                totalUsers: apiStats.totalUsers !== undefined ? apiStats.totalUsers : fetchedUsers.length,
+                totalJobseekers: apiStats.totalJobseekers !== undefined ? apiStats.totalJobseekers : fetchedUsers.filter(u => u.role === 'jobseeker').length,
+                totalEmployers: apiStats.totalEmployers !== undefined ? apiStats.totalEmployers : fetchedUsers.filter(u => u.role === 'employer').length,
+                totalJobs: apiStats.totalJobs !== undefined ? apiStats.totalJobs : fetchedJobs.length,
+                activeJobs: apiStats.activeJobs !== undefined ? apiStats.activeJobs : fetchedJobs.filter(j => j.isActive).length,
+                totalApplications: apiStats.totalApplications !== undefined ? apiStats.totalApplications : fetchedApps.length,
+                statusBreakdown: apiStats.statusBreakdown || [],
+            };
+
+            setStats(computedStats); 
+            setUsers(fetchedUsers); 
+            setJobs(fetchedJobs);
+            setApplications(fetchedApps);
+        } catch (err) { console.error('fetchDashboard error:', err); }
         finally { setLoading(false); }
     };
 
