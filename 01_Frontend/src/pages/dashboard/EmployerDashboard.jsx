@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { jobsAPI, applicationsAPI } from '../../services/api';
+import { getProfileCompletion, getEmployerProfileItems } from '../../utils/profileCompletion';
 import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import toast from 'react-hot-toast';
@@ -78,15 +79,9 @@ export default function EmployerDashboard() {
     const totalApplications = jobs.reduce((sum, j) => sum + (j.applicationsCount || 0), 0);
     const activeJobs = jobs.filter(j => j.isActive).length;
 
-    // Employer profile completion (5 items, threshold 80% = 4/5 done)
-    const empProfileItems = [
-        { label: 'Company name', done: !!user?.companyName },
-        { label: 'Company website', done: !!user?.companyWebsite },
-        { label: 'Industry', done: !!user?.industry },
-        { label: 'Company size', done: !!(user?.companySize && user.companySize !== '') },
-        { label: 'Company description', done: !!user?.companyDescription },
-    ];
-    const empProfilePct = Math.round((empProfileItems.filter(i => i.done).length / empProfileItems.length) * 100);
+    // Employer profile completion
+    const empProfileItems = getEmployerProfileItems(user);
+    const empProfilePct = getProfileCompletion(user);
 
     return (
         <div style={{ background: 'var(--bg)', minHeight: '100vh', transition: 'background 0.2s, color 0.2s' }}>

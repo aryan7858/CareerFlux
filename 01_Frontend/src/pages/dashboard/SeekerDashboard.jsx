@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { applicationsAPI, resumesAPI, aiAPI, profileAPI, SERVER_URL } from '../../services/api';
+import { getJobseekerProfileItems, getProfileCompletion } from '../../utils/profileCompletion';
 import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import toast from 'react-hot-toast';
@@ -203,14 +204,8 @@ export default function SeekerDashboard() {
         accepted: applications.filter(a => a.status === 'accepted').length,
     };
 
-    const profileItems = [
-        { label: 'Full name', done: !!(user?.firstName || user?.name) },
-        { label: 'Email verified', done: !!user?.email },
-        { label: 'Headline / bio', done: !!user?.headline },
-        { label: 'Skills listed', done: user?.skills?.length > 0 },
-        { label: 'Resume uploaded', done: !!resume },
-    ];
-    const profilePct = Math.round((profileItems.filter(i => i.done).length / profileItems.length) * 100);
+    const profileItems = getJobseekerProfileItems(user, resume);
+    const profilePct = getProfileCompletion(user, resume);
 
     return (
         <div style={{ background: 'var(--bg)', minHeight: '100vh', transition: 'background 0.2s, color 0.2s' }}>
