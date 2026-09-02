@@ -302,7 +302,7 @@ export default function SeekerDashboard() {
                 )}
 
                 {/* AI Recommendations Section */}
-                {recommendations.length > 0 && (
+                {recommendations.length > 0 ? (
                     <div className="animate-fade-in-delay" style={{
                         background: 'linear-gradient(135deg, var(--green-bg), rgba(34, 197, 94, 0.05))',
                         border: '1.5px solid var(--green-border)',
@@ -391,6 +391,30 @@ export default function SeekerDashboard() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                ) : (
+                    <div style={{
+                        background: 'var(--surface)', border: '1px dashed var(--border)',
+                        borderRadius: 16, padding: '18px 24px', marginBottom: 32,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14,
+                        boxShadow: 'var(--card-shadow)'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                            <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--green-bg)', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+                                ✨
+                            </div>
+                            <div>
+                                <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.92rem', margin: '0 0 2px 0' }}>
+                                    Unlock AI Smart Match Recommendations
+                                </p>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>
+                                    Add your skills to your profile so our AI can automatically match you with top job opportunities.
+                                </p>
+                            </div>
+                        </div>
+                        <Link to="/profile" style={{ background: 'var(--green-bg)', color: '#22c55e', border: '1px solid var(--green-border)', padding: '8px 16px', borderRadius: 8, textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            Add Skills →
+                        </Link>
                     </div>
                 )}
 
