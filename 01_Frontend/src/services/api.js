@@ -53,6 +53,7 @@ export const jobsAPI = {
     update: (id, data) => API.put(`/jobs/${id}`, data),
     delete: (id) => API.delete(`/jobs/${id}`),
     getEmployerJobs: (params) => API.get('/jobs/employer/my-jobs', { params }),
+    getPublicStats: () => API.get('/jobs/stats/public'),
 };
 
 // ── Applications API ──────────────────────────────────────────────────────────

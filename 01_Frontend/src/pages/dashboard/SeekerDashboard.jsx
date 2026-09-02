@@ -62,6 +62,16 @@ export default function SeekerDashboard() {
     const [portfolioFile, setPortfolioFile] = useState(null);
     const [submittingPortfolio, setSubmittingPortfolio] = useState(false);
 
+    // Profile-completion banner — dismissible per session (reappears on next login)
+    const bannerSessionKey = `cf_banner_dismissed_${user?._id || ''}`;
+    const [bannerDismissed, setBannerDismissed] = useState(
+        () => sessionStorage.getItem(bannerSessionKey) === '1'
+    );
+    const dismissBanner = () => {
+        sessionStorage.setItem(bannerSessionKey, '1');
+        setBannerDismissed(true);
+    };
+
     const handleVerificationUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -228,6 +238,73 @@ export default function SeekerDashboard() {
                     <StatCard icon={<HiDocumentText />} label="Shortlisted" value={stats.shortlisted} bgVar="--stat-grn-bg" colorVar="--stat-grn-cl" />
                     <StatCard icon={<HiCheckCircle />} label="Accepted" value={stats.accepted} bgVar="--stat-pur-bg" colorVar="--stat-pur-cl" />
                 </div>
+
+                {/* ── Profile Completion Banner ─────────────────────────────────────────── */}
+                {/* Renders when profilePct < 80 AND not dismissed this session */}
+                {profilePct < 80 && !bannerDismissed && (
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+                        background: 'linear-gradient(135deg, rgba(234,179,8,0.1), rgba(245,158,11,0.06))',
+                        border: '1.5px solid rgba(234,179,8,0.35)',
+                        borderRadius: 14, padding: '14px 18px', marginBottom: 24,
+                        boxShadow: '0 2px 12px rgba(234,179,8,0.08)',
+                        transition: 'all 0.2s',
+                    }}>
+                        {/* Progress ring (simple SVG) */}
+                        <svg width="48" height="48" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
+                            <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(234,179,8,0.18)" strokeWidth="5" />
+                            <circle cx="24" cy="24" r="19" fill="none" stroke="#f59e0b" strokeWidth="5"
+                                strokeDasharray={`${2 * Math.PI * 19}`}
+                                strokeDashoffset={`${2 * Math.PI * 19 * (1 - profilePct / 100)}`}
+                                strokeLinecap="round"
+                                transform="rotate(-90 24 24)"
+                                style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                            />
+                            <text x="24" y="28" textAnchor="middle" fontSize="11" fontWeight="800" fill="#f59e0b">{profilePct}%</text>
+                        </svg>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                            <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.92rem', marginBottom: 2 }}>
+                                Your profile is {profilePct}% complete
+                            </p>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                                {profilePct < 40
+                                    ? 'Complete your profile to get noticed by employers and unlock AI Match.'
+                                    : profilePct < 60
+                                        ? 'Almost halfway — add skills and a headline to stand out.'
+                                        : 'You\'re close! Upload a resume or add more skills to reach 80%.'}
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
+                            <Link
+                                to="/profile"
+                                style={{
+                                    background: '#f59e0b', color: '#fff', textDecoration: 'none',
+                                    padding: '7px 16px', borderRadius: 8, fontWeight: 700, fontSize: '0.82rem',
+                                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                                    transition: 'opacity 0.15s',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                            >
+                                Complete Profile →
+                            </Link>
+                            <button
+                                onClick={dismissBanner}
+                                title="Dismiss until next login"
+                                style={{
+                                    background: 'transparent', border: '1px solid rgba(234,179,8,0.35)',
+                                    color: 'var(--text-muted)', borderRadius: 8, padding: '7px 10px',
+                                    fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600,
+                                    transition: 'all 0.15s',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.color = '#f59e0b'; }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(234,179,8,0.35)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                            >
+                                ✕ Dismiss
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* AI Recommendations Section */}
                 {recommendations.length > 0 && (

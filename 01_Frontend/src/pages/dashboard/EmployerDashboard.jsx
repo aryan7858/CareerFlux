@@ -40,6 +40,16 @@ export default function EmployerDashboard() {
     const [assignedApps, setAssignedApps] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Profile-completion banner — dismissible per session (reappears on next login)
+    const bannerSessionKey = `cf_emp_banner_${user?._id || ''}`;
+    const [bannerDismissed, setBannerDismissed] = useState(
+        () => sessionStorage.getItem(bannerSessionKey) === '1'
+    );
+    const dismissBanner = () => {
+        sessionStorage.setItem(bannerSessionKey, '1');
+        setBannerDismissed(true);
+    };
+
     useEffect(() => { fetchDashboardData(); }, []);
 
     const fetchDashboardData = async () => {
@@ -68,6 +78,16 @@ export default function EmployerDashboard() {
     const totalApplications = jobs.reduce((sum, j) => sum + (j.applicationsCount || 0), 0);
     const activeJobs = jobs.filter(j => j.isActive).length;
 
+    // Employer profile completion (5 items, threshold 80% = 4/5 done)
+    const empProfileItems = [
+        { label: 'Company name', done: !!user?.companyName },
+        { label: 'Company website', done: !!user?.companyWebsite },
+        { label: 'Industry', done: !!user?.industry },
+        { label: 'Company size', done: !!(user?.companySize && user.companySize !== '') },
+        { label: 'Company description', done: !!user?.companyDescription },
+    ];
+    const empProfilePct = Math.round((empProfileItems.filter(i => i.done).length / empProfileItems.length) * 100);
+
     return (
         <div style={{ background: 'var(--bg)', minHeight: '100vh', transition: 'background 0.2s, color 0.2s' }}>
             <Navbar />
@@ -92,6 +112,65 @@ export default function EmployerDashboard() {
                     <StatCard icon={<HiEye />} label="Active Listings" value={activeJobs} bgVar="--stat-grn-bg" colorVar="--stat-grn-cl" />
                     <StatCard icon={<HiUserGroup />} label="Total Applicants" value={totalApplications} bgVar="--stat-amb-bg" colorVar="--stat-amb-cl" />
                 </div>
+
+                {/* ── Employer Profile Completion Banner ────────────────────────────────── */}
+                {empProfilePct < 80 && !bannerDismissed && (
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+                        background: 'linear-gradient(135deg, rgba(234,179,8,0.1), rgba(245,158,11,0.06))',
+                        border: '1.5px solid rgba(234,179,8,0.35)',
+                        borderRadius: 14, padding: '14px 18px', marginBottom: 24,
+                        boxShadow: '0 2px 12px rgba(234,179,8,0.08)',
+                    }}>
+                        <svg width="48" height="48" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
+                            <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(234,179,8,0.18)" strokeWidth="5" />
+                            <circle cx="24" cy="24" r="19" fill="none" stroke="#f59e0b" strokeWidth="5"
+                                strokeDasharray={`${2 * Math.PI * 19}`}
+                                strokeDashoffset={`${2 * Math.PI * 19 * (1 - empProfilePct / 100)}`}
+                                strokeLinecap="round" transform="rotate(-90 24 24)"
+                                style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                            />
+                            <text x="24" y="28" textAnchor="middle" fontSize="11" fontWeight="800" fill="#f59e0b">{empProfilePct}%</text>
+                        </svg>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                            <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.92rem', marginBottom: 2 }}>
+                                Company profile is {empProfilePct}% complete
+                            </p>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                                {empProfilePct < 40
+                                    ? 'Fill in your company details so job seekers know who you are.'
+                                    : empProfilePct < 60
+                                        ? 'Add your industry and company size to attract better candidates.'
+                                        : 'Almost there! Add a company description to complete your profile.'}
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                            <Link
+                                to="/profile"
+                                style={{
+                                    background: '#f59e0b', color: '#fff', textDecoration: 'none',
+                                    padding: '7px 16px', borderRadius: 8, fontWeight: 700, fontSize: '0.82rem',
+                                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                            >
+                                Complete Profile →
+                            </Link>
+                            <button onClick={dismissBanner}
+                                style={{
+                                    background: 'transparent', border: '1px solid rgba(234,179,8,0.35)',
+                                    color: 'var(--text-muted)', borderRadius: 8, padding: '7px 10px',
+                                    fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600,
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.color = '#f59e0b'; }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(234,179,8,0.35)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                            >
+                                ✕ Dismiss
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Jobs Table */}
                 <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, boxShadow: 'var(--card-shadow)' }}>

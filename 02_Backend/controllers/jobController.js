@@ -2,6 +2,31 @@ const Job = require('../models/Job');
 const { sendSuccess, sendError } = require('../utils/response');
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Public platform stats (no auth) for homepage
+// @route   GET /api/jobs/stats/public
+// @access  Public
+// ─────────────────────────────────────────────────────────────────────────────
+exports.getPublicStats = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const [totalJobs, totalJobseekers, companiesAgg] = await Promise.all([
+            Job.countDocuments({ isActive: true }),
+            User.countDocuments({ role: 'jobseeker', isActive: true }),
+            Job.aggregate([
+                { $match: { isActive: true } },
+                { $group: { _id: '$company' } },
+                { $count: 'total' },
+            ]),
+        ]);
+        const uniqueCompanies = companiesAgg[0]?.total || 0;
+        return sendSuccess(res, { totalJobs, uniqueCompanies, totalJobseekers });
+    } catch (err) {
+        console.error('getPublicStats error:', err);
+        return sendError(res, 'Failed to fetch public stats.', 500);
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Create a new job posting
 // @route   POST /api/jobs
 // @access  Private (Employer)

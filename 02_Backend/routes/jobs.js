@@ -8,6 +8,7 @@ const {
     updateJob,
     deleteJob,
     getEmployerJobs,
+    getPublicStats,
 } = require('../controllers/jobController');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -16,6 +17,9 @@ const { protect, authorize } = require('../middleware/auth');
 
 // GET /api/jobs — Browse all active jobs with search/filter
 router.get('/', getJobs);
+
+// GET /api/jobs/stats/public — Live platform stats for homepage (no auth)
+router.get('/stats/public', getPublicStats);
 
 // GET /api/jobs/:id — View single job
 router.get('/:id', getJobById);

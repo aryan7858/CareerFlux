@@ -1,10 +1,13 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Web3MediaHero } from '@/components/ui/web3media-hero';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { jobsAPI } from '../services/api';
 import {
     HiArrowRight, HiCode, HiTrendingUp, HiColorSwatch, HiSpeakerphone,
     HiAcademicCap, HiCheckCircle, HiUserGroup, HiLightningBolt, HiShieldCheck,
+    HiBriefcase,
 } from 'react-icons/hi';
 
 const categories = [
@@ -50,8 +53,18 @@ function BrandText({ name, width = 80 }) {
     );
 }
 
+/* Minimum count required to display a stat publicly */
+const STAT_THRESHOLD = 20;
+
 export default function Home() {
     const navigate = useNavigate();
+    const [publicStats, setPublicStats] = useState(null);
+
+    useEffect(() => {
+        jobsAPI.getPublicStats()
+            .then(res => setPublicStats(res.data))
+            .catch(() => setPublicStats(null)); // fail silently — never break the page
+    }, []);
 
     return (
         <div style={{ background: 'var(--bg)', minHeight: '100vh', transition: 'background 0.2s, color 0.2s' }}>
@@ -118,11 +131,46 @@ export default function Home() {
                             <p style={{ color: 'var(--text-faint)', fontSize: '0.78rem' }}>{cat.count} vacancy</p>
                         </Link>
                     ))}
-                    <div style={{ background: '#22c55e', borderRadius: 12, padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, minHeight: 160 }}>
-                        <p style={{ fontWeight: 800, fontSize: '2rem', color: '#fff', lineHeight: 1.1 }}>13k+</p>
-                        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem', fontWeight: 500 }}>Jobs already posted</p>
-                        <Link to="/jobs" style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textDecoration: 'none', fontSize: 18 }}><HiArrowRight /></Link>
-                    </div>
+                    {/* Live stats tile — replaces the hardcoded "13k+" bubble */}
+                    {(() => {
+                        // Build list of stats that clear the threshold
+                        const visibleStats = publicStats ? [
+                            publicStats.totalJobs >= STAT_THRESHOLD && { icon: <HiBriefcase />, value: `${publicStats.totalJobs}+`, label: 'Active Jobs' },
+                            publicStats.uniqueCompanies >= STAT_THRESHOLD && { icon: <HiUserGroup />, value: `${publicStats.uniqueCompanies}+`, label: 'Companies' },
+                            publicStats.totalJobseekers >= STAT_THRESHOLD && { icon: <HiCheckCircle />, value: `${publicStats.totalJobseekers}+`, label: 'Job Seekers' },
+                        ].filter(Boolean) : [];
+
+                        if (!publicStats) return null; // still loading — no flash, no placeholder
+
+                        if (visibleStats.length === 0) {
+                            // No stat clears the threshold — neutral growth tagline
+                            return (
+                                <div style={{ background: '#22c55e', borderRadius: 12, padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, minHeight: 160 }}>
+                                    <p style={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', lineHeight: 1.3 }}>New listings added daily</p>
+                                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem', fontWeight: 500 }}>Be among the first to apply</p>
+                                    <Link to="/jobs" style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textDecoration: 'none', fontSize: 18 }}><HiArrowRight /></Link>
+                                </div>
+                            );
+                        }
+
+                        // At least one stat clears — show the live card
+                        return (
+                            <div style={{ background: '#22c55e', borderRadius: 12, padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 14, minHeight: 160 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    {visibleStats.map(s => (
+                                        <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }}>{s.icon}</span>
+                                            <div>
+                                                <p style={{ fontWeight: 800, fontSize: '1.25rem', color: '#fff', lineHeight: 1 }}>{s.value}</p>
+                                                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.7rem', fontWeight: 500 }}>{s.label}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <Link to="/jobs" style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textDecoration: 'none', fontSize: 18 }}><HiArrowRight /></Link>
+                            </div>
+                        );
+                    })()}
                 </div>
             </section>
 
