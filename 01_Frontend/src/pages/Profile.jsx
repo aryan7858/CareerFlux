@@ -1,4 +1,103 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import toast from 'react-hot-toast';
+import {
+    HiUser, HiMail, HiPhone, HiLocationMarker, HiPencil, HiSave,
+    HiBriefcase, HiLink, HiCode, HiOfficeBuilding, HiCheck,
+    HiX, HiPlus,
+} from 'react-icons/hi';
 import { getProfileCompletion } from '../utils/profileCompletion';
+
+// ── Reusable Input with floating label support ──────────────────
+function Input({ label, icon, value, onChange, type = 'text', placeholder = '', rows }) {
+    const [focused, setFocused] = useState(false);
+    const baseStyle = {
+        width: '100%', border: '1.5px solid', borderColor: focused ? '#22c55e' : 'var(--border)',
+        borderRadius: 10, fontSize: '0.875rem', color: 'var(--text)',
+        outline: 'none', fontFamily: 'inherit', background: 'var(--input-bg)',
+        transition: 'border-color 0.2s, box-shadow 0.2s',
+        boxShadow: focused ? '0 0 0 3px rgba(34,197,94,0.1)' : 'none',
+        paddingLeft: icon ? 42 : 14,
+        paddingRight: 14,
+    };
+    return (
+        <div>
+            {label && <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>{label}</label>}
+            <div style={{ position: 'relative' }}>
+                {icon && <span style={{ position: 'absolute', left: 14, top: rows ? 14 : '50%', transform: rows ? 'none' : 'translateY(-50%)', color: focused ? '#22c55e' : 'var(--text-faint)', fontSize: 17, pointerEvents: 'none', transition: 'color 0.2s' }}>{icon}</span>}
+                {rows ? (
+                    <textarea rows={rows} value={value} onChange={onChange} placeholder={placeholder}
+                        style={{ ...baseStyle, paddingTop: 13, paddingBottom: 13, resize: 'vertical', lineHeight: 1.6 }}
+                        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
+                ) : (
+                    <input type={type} value={value} onChange={onChange} placeholder={placeholder}
+                        style={{ ...baseStyle, paddingTop: 13, paddingBottom: 13 }}
+                        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ── Avatar with initials ──────────────────────────────────────────
+function Avatar({ name, size = 80 }) {
+    const initials = (name || 'U').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
+    return (
+        <div style={{ width: size, height: size, borderRadius: '50%', background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: size * 0.32, color: '#fff', flexShrink: 0, boxShadow: '0 4px 20px rgba(34,197,94,0.3)' }}>
+            {initials}
+        </div>
+    );
+}
+
+// ── Skills chips component (add/remove) ──────────────────────
+function SkillsInput({ value, onChange }) {
+    const [input, setInput] = useState('');
+    const skills = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const add = () => {
+        const trimmed = input.trim();
+        if (!trimmed || skills.includes(trimmed)) return;
+        onChange(skills.concat(trimmed).join(', '));
+        setInput('');
+    };
+    const remove = (skill) => onChange(skills.filter(s => s !== skill).join(', '));
+
+    return (
+        <div>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Skills</label>
+            <div style={{ border: '1.5px solid var(--border)', borderRadius: 10, padding: '10px 12px', background: 'var(--input-bg)', display: 'flex', flexWrap: 'wrap', gap: 6, minHeight: 48 }}>
+                {skills.map(skill => (
+                    <span key={skill} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--green-bg)', border: '1px solid var(--green-border)', color: '#22c55e', padding: '3px 10px', borderRadius: 99, fontSize: '0.78rem', fontWeight: 600 }}>
+                        {skill}
+                        <button type="button" onClick={() => remove(skill)} style={{ background: 'none', border: 'none', color: '#22c55e', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', padding: 0, fontSize: 13 }}><HiX /></button>
+                    </span>
+                ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, minWidth: 120 }}>
+                    <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add(); } }}
+                        placeholder="Add a skill..." style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.83rem', color: 'var(--text)', fontFamily: 'inherit', flex: 1 }} />
+                    <button type="button" onClick={add} style={{ background: '#22c55e', border: 'none', color: '#fff', width: 22, height: 22, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}><HiPlus /></button>
+                </div>
+            </div>
+            <p style={{ color: 'var(--text-faint)', fontSize: '0.73rem', marginTop: 5 }}>Press Enter or + to add a skill</p>
+        </div>
+    );
+}
+
+// ── Section wrapper ───────────────────────────────────────────────
+function Section({ title, icon, children }) {
+    return (
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', boxShadow: 'var(--card-shadow)' }}>
+            <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: '#22c55e', fontSize: 18 }}>{icon}</span>
+                <h3 style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.95rem' }}>{title}</h3>
+            </div>
+            <div style={{ padding: 22 }}>{children}</div>
+        </div>
+    );
+}
 
 // ── MAIN COMPONENT ────────────────────────────────────────────────
 export default function Profile() {
@@ -23,6 +122,28 @@ export default function Profile() {
         industry: user?.industry || '',
         companyDescription: user?.companyDescription || '',
     });
+
+    useEffect(() => {
+        if (user) {
+            setForm({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                headline: user.headline || '',
+                bio: user.bio || '',
+                location: user.location || '',
+                phone: user.phone || '',
+                skills: user.skills?.join(', ') || '',
+                linkedIn: user.linkedIn || '',
+                github: user.github || '',
+                portfolio: user.portfolio || '',
+                companyName: user.companyName || '',
+                companyWebsite: user.companyWebsite || '',
+                companySize: user.companySize || '',
+                industry: user.industry || '',
+                companyDescription: user.companyDescription || '',
+            });
+        }
+    }, [user]);
 
     const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
     const setVal = (key) => (val) => setForm({ ...form, [key]: val });

@@ -40,7 +40,7 @@ export default function App() {
             />
             <Route
                 path="/profile"
-                element={<ProtectedRoute roles={['jobseeker', 'employer']}><Profile /></ProtectedRoute>}
+                element={<ProtectedRoute roles={['jobseeker', 'employer', 'admin']}><Profile /></ProtectedRoute>}
             />
 
             {/* Employer Routes */}
