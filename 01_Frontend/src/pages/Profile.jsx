@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -102,8 +103,16 @@ function Section({ title, icon, children }) {
 // ── MAIN COMPONENT ────────────────────────────────────────────────
 export default function Profile() {
     const { user, refreshUser } = useAuth();
+    const [searchParams] = useSearchParams();
+    const tabParam = searchParams.get('tab');
     const [loading, setLoading] = useState(false);
-    const [tab, setTab] = useState('personal');
+    const [tab, setTab] = useState(tabParam || 'personal');
+
+    useEffect(() => {
+        if (tabParam) {
+            setTab(tabParam);
+        }
+    }, [tabParam]);
 
     const [form, setForm] = useState({
         firstName: user?.firstName || '',

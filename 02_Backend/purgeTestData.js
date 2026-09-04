@@ -67,15 +67,19 @@ async function safePurge() {
             console.log(`🗑  Deleted ${delJobs.deletedCount} test fixture jobs.`);
         }
 
-        // Safe orphan cleanup: Only delete applications specifically pointing to deleted test jobs/users
-        if (testJobIds.length > 0 || testUserIds.length > 0) {
-            const delApps = await Application.deleteMany({
-                $or: [
-                    { job: { $in: testJobIds } },
-                    { applicant: { $in: testUserIds } }
-                ]
-            });
-            console.log(`🧹 Cleaned up ${delApps.deletedCount} applications linked to test fixtures.`);
+        // Safe orphan cleanup: delete applications pointing to deleted test fixtures or non-existent jobs/users
+        const validJobIds = (await Job.find().select('_id')).map(j => j._id);
+        const validUserIds = (await User.find().select('_id')).map(u => u._id);
+        const delApps = await Application.deleteMany({
+            $or: [
+                { job: { $in: testJobIds } },
+                { applicant: { $in: testUserIds } },
+                { job: { $nin: validJobIds } },
+                { applicant: { $nin: validUserIds } }
+            ]
+        });
+        if (delApps.deletedCount > 0) {
+            console.log(`🧹 Cleaned up ${delApps.deletedCount} orphaned applications.`);
         }
 
         console.log('\n✨ Safe purge complete!');

@@ -548,6 +548,11 @@ export default function AdminDashboard() {
                                                             <div style={{ fontWeight: 600 }}>{app.job.title}</div>
                                                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{app.job.company}</div>
                                                         </>
+                                                    ) : app.jobTitle ? (
+                                                        <>
+                                                            <div style={{ fontWeight: 600 }}>{app.jobTitle}</div>
+                                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{app.company || 'Archived'}</div>
+                                                        </>
                                                     ) : (
                                                         <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Job Unavailable</span>
                                                     )}

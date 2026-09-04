@@ -394,25 +394,25 @@ export default function SeekerDashboard() {
                     </div>
                 ) : (
                     <div style={{
-                        background: 'var(--surface)', border: '1px dashed var(--border)',
+                        background: 'var(--surface)', border: '1px dashed var(--green-border)',
                         borderRadius: 16, padding: '18px 24px', marginBottom: 32,
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14,
                         boxShadow: 'var(--card-shadow)'
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                            <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--green-bg)', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+                            <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--green-bg)', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
                                 ✨
                             </div>
                             <div>
-                                <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.92rem', margin: '0 0 2px 0' }}>
-                                    Unlock AI Smart Match Recommendations
+                                <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.94rem', margin: '0 0 2px 0' }}>
+                                    Add your skills to unlock AI Smart Match recommendations
                                 </p>
-                                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>
-                                    Add your skills to your profile so our AI can automatically match you with top job opportunities.
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>
+                                    Tell us what you're good at so our AI can match you with the best open roles.
                                 </p>
                             </div>
                         </div>
-                        <Link to="/profile" style={{ background: 'var(--green-bg)', color: '#22c55e', border: '1px solid var(--green-border)', padding: '8px 16px', borderRadius: 8, textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                        <Link to="/profile?tab=skills" style={{ background: 'var(--green-bg)', color: '#22c55e', border: '1px solid var(--green-border)', padding: '9px 18px', borderRadius: 8, textDecoration: 'none', fontSize: '0.84rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'all 0.15s' }}>
                             Add Skills →
                         </Link>
                     </div>

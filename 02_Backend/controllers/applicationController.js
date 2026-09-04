@@ -46,6 +46,8 @@ exports.applyForJob = async (req, res) => {
             applicant: req.user._id,
             resume: resumeId || undefined,
             coverLetter,
+            jobTitle: job.title,
+            company: job.company,
         });
 
         // Increment application count on the job

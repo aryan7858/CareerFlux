@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const User = require('../models/User');
+const Job = require('../models/Job');
+const Application = require('../models/Application');
 const { generateToken, generateShortToken } = require('../utils/jwt');
 const { sendSuccess, sendError } = require('../utils/response');
 
@@ -255,8 +257,24 @@ exports.resetPassword = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 exports.deleteAccount = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.user._id);
-    return sendSuccess(res, {}, 'Account deleted successfully.');
+    const userId = req.user._id;
+    await User.findByIdAndDelete(userId);
+
+    // Cascade delete jobs posted by this user and all associated applications
+    const userJobs = await Job.find({ postedBy: userId }).select('_id');
+    const userJobIds = userJobs.map(j => j._id);
+    if (userJobIds.length > 0) {
+      await Job.deleteMany({ _id: { $in: userJobIds } });
+    }
+
+    await Application.deleteMany({
+      $or: [
+        { applicant: userId },
+        { job: { $in: userJobIds } }
+      ]
+    });
+
+    return sendSuccess(res, {}, 'Account and associated data deleted successfully.');
   } catch (err) {
     console.error('DeleteAccount error:', err);
     return sendError(res, 'Failed to delete account.', 500);

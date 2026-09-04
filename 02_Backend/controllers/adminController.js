@@ -141,7 +141,21 @@ exports.deleteUser = async (req, res) => {
             return sendError(res, 'User not found.', 404);
         }
 
-        return sendSuccess(res, {}, 'User deleted successfully.');
+        // Cascade delete all jobs posted by this user and all associated applications
+        const userJobs = await Job.find({ postedBy: req.params.id }).select('_id');
+        const userJobIds = userJobs.map(j => j._id);
+        if (userJobIds.length > 0) {
+            await Job.deleteMany({ _id: { $in: userJobIds } });
+        }
+
+        await Application.deleteMany({
+            $or: [
+                { applicant: req.params.id },
+                { job: { $in: userJobIds } }
+            ]
+        });
+
+        return sendSuccess(res, {}, 'User and associated data deleted successfully.');
     } catch (err) {
         console.error('DeleteUser error:', err);
         return sendError(res, 'Failed to delete user.', 500);
